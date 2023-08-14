@@ -10,7 +10,6 @@ const mainElement = bodyElement.querySelector('.page-main');
 const eventListElement = mainElement.querySelector('.trip-events');
 
 const pointsModel = new PointsModel();
-console.log(pointsModel.getPoints());
 const boardPresenter = new BoardPresenter(eventListElement, pointsModel);
 const headerPresenter = new HeaderPresenter(tripInfoElement, filterElement);
 
