@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import { humanizePointDate} from '../util.js';
 
 const POINT_EDIT_DATE_FORMAT = 'DD/MM/YY HH:mm';
@@ -73,6 +73,7 @@ function createPointEditTemplate(point){
             <label class="event__type-label  event__type-label--flight" for="event-type-flight-1">Flight</label>
           </div>
 
+
           <div class="event__type-item">
             <input id="event-type-check-in-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="check-in">
             <label class="event__type-label  event__type-label--check-in" for="event-type-check-in-1">Check-in</label>
@@ -143,24 +144,28 @@ function createPointEditTemplate(point){
 </form></li>`);
 }
 
-export default class PointEditView{
-  constructor(point){
-    this.point = point;
+export default class PointEditView extends AbstractView{
+  #point = null;
+  #handleFormSubmit = null;
+
+  constructor(point, onFormSubmit){
+    super();
+    this.#point = point;
+    this.#handleFormSubmit = onFormSubmit;
+
+    this.element.querySelector('.event--edit')
+      .addEventListener('submit', this.#formSubmitHandler);
+
+    this.element.querySelector('.event__rollup-btn')
+      .addEventListener('click', this.#formSubmitHandler);
   }
 
-  getTemplate() {
-    return createPointEditTemplate(this.point);
+  get template() {
+    return createPointEditTemplate(this.#point);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
-  }
+  #formSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFormSubmit();
+  };
 }

@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 function createPointCreateTemplate(){
   return (`<li class="trip-events__item">
@@ -10,7 +10,6 @@ function createPointCreateTemplate(){
         <img class="event__type-icon" width="17" height="17" src="img/icons/flight.png" alt="Event type icon">
       </label>
       <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
-
       <div class="event__type-list">
         <fieldset class="event__type-group">
           <legend class="visually-hidden">Event type</legend>
@@ -164,20 +163,8 @@ function createPointCreateTemplate(){
 </form></li>`);
 }
 
-export default class FormCreateView{
-  getTemplate() {
+export default class FormCreateView extends AbstractView{
+  get template() {
     return createPointCreateTemplate();
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
   }
 }
