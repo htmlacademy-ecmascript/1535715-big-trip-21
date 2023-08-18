@@ -15,6 +15,7 @@ function createPointOffersTemplate(offers) {
   ).join('');
 }
 
+
 function createPointTemplate(point){
   const {dates, type, cost, offers, destination, isFavorite} = point;
 
