@@ -15,4 +15,3 @@ const headerPresenter = new HeaderPresenter(tripInfoElement, filterElement);
 
 headerPresenter.init();
 boardPresenter.init();
-
