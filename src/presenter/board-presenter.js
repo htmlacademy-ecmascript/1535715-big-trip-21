@@ -11,6 +11,7 @@ const EmptyListTexts = {
   PRESENT: 'There are no present events now',
   PAST: 'There are no past events now',
 };
+
 export default class BoardPresenter{
   #sortComponent = new SortView();
   #eventListComponent = new EventListView();

@@ -53,12 +53,11 @@ function createPointEditTemplate(point){
       <div class="event__type-list">
         <fieldset class="event__type-group">
           <legend class="visually-hidden">Event type</legend>
-
           ${createEventTypes(PointTypes)}
         </fieldset>
       </div>
     </div>
-
+    
     <div class="event__field-group  event__field-group--destination">
       <label class="event__label  event__type-output" for="event-destination-1">
         ${type.name}
