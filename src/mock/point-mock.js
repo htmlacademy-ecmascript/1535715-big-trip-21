@@ -196,4 +196,4 @@ function generateRandomWayPoint() {
   });
 }
 
-export {generateRandomWayPoint};
+export {generateRandomWayPoint, PointTypes};
