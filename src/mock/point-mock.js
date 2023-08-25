@@ -1,3 +1,4 @@
+import {nanoid} from 'nanoid';
 import { generateRandomInteger, getRandomArrayElement } from '../util.js';
 
 const DESTINATION_DESCRIPTIONS = [
@@ -184,6 +185,7 @@ function generateRandomWayPoint() {
   const [firstDate, secondDate] = generateRandomDate();
 
   return ({
+    id: nanoid(),
     type: randomPointType,
     destination: getRandomArrayElement(destinations),
     dates: {
