@@ -37,4 +37,8 @@ function getTimeDifference(endTime, startTime) {
 
 }
 
-export {generateRandomInteger, getRandomArrayElement, humanizePointDate, getTimeDifference};
+function updateItem(items, update) {
+  return items.map((item) => item.id === update.id ? update : item);
+}
+
+export {generateRandomInteger, getRandomArrayElement, humanizePointDate, getTimeDifference, updateItem};

@@ -184,6 +184,7 @@ function generateRandomWayPoint() {
   const [firstDate, secondDate] = generateRandomDate();
 
   return ({
+    id: crypto.randomUUID(),
     type: randomPointType,
     destination: getRandomArrayElement(destinations),
     dates: {
