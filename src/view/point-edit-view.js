@@ -4,6 +4,16 @@ import { PointTypes } from '../mock/point-mock.js';
 
 const POINT_EDIT_DATE_FORMAT = 'DD/MM/YY HH:mm';
 
+const POINT_BLANK = {
+  id: crypto.randomUUID(),
+  type: PointTypes.TAXI,
+  destination: '',
+  dates: '',
+  offers: '',
+  cost: 0,
+  isFavorite: false
+};
+
 function createEventTypes(pointTypes) {
   const pointTypeNames = Object.values(pointTypes).map((pointType) => pointType.name);
 
@@ -114,7 +124,7 @@ export default class PointEditView extends AbstractView{
   #point = null;
   #handleFormSubmit = null;
 
-  constructor(point, onFormSubmit){
+  constructor({point = POINT_BLANK, onFormSubmit}){
     super();
     this.#point = point;
     this.#handleFormSubmit = onFormSubmit;

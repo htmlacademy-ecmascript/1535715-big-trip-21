@@ -2,8 +2,15 @@ import SortView from '../view/sort-view.js';
 import EventListView from '../view/events-list-view.js';
 import EmptyListView from '../view/empty-list-view.js';
 import PointPresenter from './point-presenter.js';
+import dayjs from 'dayjs';
 import { render } from '../framework/render.js';
 import { updateItem } from '../util.js';
+
+const SORT_TYPES = {
+  DAY: 'sort-day',
+  TIME: 'sort-time',
+  PRICE: 'sort-price'
+};
 
 const EmptyListTexts = {
   EVERYTHING: 'Click New Event to create your first point',
@@ -12,32 +19,30 @@ const EmptyListTexts = {
   PAST: 'There are no past events now',
 };
 export default class BoardPresenter{
-  #sortComponent = new SortView();
+  #sortComponent = null;
   #eventListContainer = new EventListView();
-  #eventListNoPoints = new EmptyListView(EmptyListTexts.EVERYTHING);
+  #eventListNoPoints = new EmptyListView({text: EmptyListTexts.EVERYTHING});
   #container = null;
   #pointsModel = null;
   #boardPoints = [];
   #pointPresenters = new Map();
 
-  constructor(container, pointsModel){
+  constructor({container, pointsModel}){
     this.#container = container;
     this.#pointsModel = pointsModel;
   }
 
   init(){
-    this.#boardPoints = [...this.#pointsModel.points];
+    this.#boardPoints = [...this.#pointsModel.points.sort((a, b) => dayjs(b.dates.start).diff(dayjs(a.start)))];
 
     if(!this.#boardPoints.length) {
       return this.#renderNoPoints();
     }
 
-    render(this.#sortComponent, this.#container);
+    this.#renderSort();
     render(this.#eventListContainer, this.#container);
 
-    for(let i = 0; i < this.#boardPoints.length; i++){
-      this.#renderPoint(this.#boardPoints[i]);
-    }
+    this.#renderPoints();
   }
 
   #handleModeChange = () => {
@@ -49,17 +54,52 @@ export default class BoardPresenter{
     this.#pointPresenters.get(updatedPoint.id).init(updatedPoint);
   };
 
-  #renderPoint(point){
-    const pointPresenter = new PointPresenter(
-      this.#eventListContainer.element,
-      this.#handlePointChange,
-      this.#handleModeChange);
+  #handleSortChange = (sortType) => {
+    this.#sortPoints(sortType);
+    this.#clearPointsList();
+    this.#renderPoints();
+  };
+
+  #sortPoints(sortType) {
+    switch(sortType) {
+      case SORT_TYPES.DAY:
+        this.#boardPoints.sort((a, b) => dayjs(b.dates.start).diff(dayjs(a.start)));
+        break;
+      case SORT_TYPES.TIME:
+        this.#boardPoints.sort(((a, b) => dayjs(b.dates.end).diff(dayjs(b.dates.start)) - dayjs(a.dates.end).diff(dayjs(a.dates.start))));
+        break;
+      case SORT_TYPES.PRICE:
+        this.#boardPoints.sort((a, b) => b.cost - a.cost);
+    }
+  }
+
+  #clearPointsList() {
+    this.#pointPresenters.forEach((presenter) => presenter.destroy());
+    this.#pointPresenters.clear();
+  }
+
+  #renderSort() {
+    this.#sortComponent = new SortView({onSortChange: this.#handleSortChange});
+    render(this.#sortComponent, this.#container);
+  }
+
+  #renderPoint(point) {
+    const pointPresenter = new PointPresenter({
+      pointContainer: this.#eventListContainer.element,
+      onDataChange: this.#handlePointChange,
+      onModeChange: this.#handleModeChange});
 
     pointPresenter.init(point);
     this.#pointPresenters.set(point.id, pointPresenter);
   }
 
-  #renderNoPoints(){
+  #renderPoints() {
+    for(let i = 0; i < this.#boardPoints.length; i++){
+      this.#renderPoint(this.#boardPoints[i]);
+    }
+  }
+
+  #renderNoPoints() {
     render(this.#eventListNoPoints, this.#container);
   }
 }

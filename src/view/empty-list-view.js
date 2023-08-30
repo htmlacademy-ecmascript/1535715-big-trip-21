@@ -6,7 +6,7 @@ function createListTemplate(text) {
 export default class EmptyListView extends AbstractView{
   #placeholderText = null;
 
-  constructor(text) {
+  constructor({text}) {
     super();
     this.#placeholderText = text;
   }

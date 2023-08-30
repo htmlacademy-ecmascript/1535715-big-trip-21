@@ -12,10 +12,10 @@ const DESTINATION_DESCRIPTIONS = [
   'Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. ',
   'In rutrum ac purus sit amet tempus. '];
 
-function getRandomDescriptionSentences(){
+function getRandomDescriptionSentences() {
   let description = '';
   const sentecesCount = generateRandomInteger(1, 5);
-  for(let i = 0; i < sentecesCount; i++){
+  for (let i = 0; i < sentecesCount; i++) {
     description += getRandomArrayElement(DESTINATION_DESCRIPTIONS);
   }
 
@@ -25,20 +25,20 @@ function getRandomDescriptionSentences(){
 function getRandomDescriptionPhotos() {
   const photosArray = [];
   const photosCount = generateRandomInteger(1, 4);
-  for(let i = 0; i < photosCount; i++){
+  for (let i = 0; i < photosCount; i++) {
     photosArray.push(`https://loremflickr.com/248/152?random=${generateRandomInteger(0, 100)}`);
   }
 
   return photosArray;
 }
 
-function getBoolean(){
+function getBoolean() {
   return Boolean(generateRandomInteger(0, 1));
 }
 
 function generateRandomDate() {
-  const startYear = 2010;
-  const endYear = 2030;
+  const startYear = 2020;
+  const endYear = 2025;
 
   const year = generateRandomInteger(startYear, endYear);
 
@@ -197,4 +197,4 @@ function generateRandomWayPoint() {
   });
 }
 
-export {generateRandomWayPoint, PointTypes};
+export { generateRandomWayPoint, PointTypes };
