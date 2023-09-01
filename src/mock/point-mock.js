@@ -61,26 +61,11 @@ function generateRandomDate() {
 }
 
 const PointTypes = {
-  TAXI: {
-    name: 'Taxi',
-    icon: './img/icons/taxi.png'
-  },
-  BUS: {
-    name: 'Bus',
-    icon: './img/icons/bus.png'
-  },
-  TRAIN: {
-    name: 'Train',
-    icon: './img/icons/train.png'
-  },
-  SHIP: {
-    name: 'Ship',
-    icon: './img/icons/ship.png'
-  },
-  DRIVE: {
-    name: 'Drive',
-    icon: './img/icons/drive.png'
-  },
+  TAXI: 'Taxi',
+  BUS: 'Bus',
+  TRAIN: 'Train',
+  SHIP: 'Ship',
+  DRIVE: 'Drive'
   // FLIGHT: {
   //   name: 'Flight',
   //   icon: './img/icons/flight.png'
@@ -99,8 +84,8 @@ const PointTypes = {
   // }
 };
 
-const offers = {
-  [PointTypes.TAXI.name]: [
+const typeOffers = {
+  [PointTypes.TAXI]: [
     {
       name: 'Transfer',
       cost: 70,
@@ -113,7 +98,7 @@ const offers = {
     }
   ],
 
-  [PointTypes.BUS.name]: [
+  [PointTypes.BUS]: [
     {
       name: 'Switch to comfort',
       cost: 80,
@@ -121,7 +106,7 @@ const offers = {
     }
   ],
 
-  [PointTypes.TRAIN.name]: [
+  [PointTypes.TRAIN]: [
     {
       name: 'Switch to coupe',
       cost: 50,
@@ -129,7 +114,7 @@ const offers = {
     }
   ],
 
-  [PointTypes.SHIP.name]: [
+  [PointTypes.SHIP]: [
     {
       name: 'Restaurant Entrance',
       cost: 200,
@@ -142,7 +127,7 @@ const offers = {
     }
   ],
 
-  [PointTypes.DRIVE.name]: [
+  [PointTypes.DRIVE]: [
     {
       name: 'Extra Luggage',
       cost: 100,
@@ -191,10 +176,10 @@ function generateRandomWayPoint() {
       start: firstDate,
       end: secondDate
     },
-    offers: offers[randomPointType.name],
+    offers: typeOffers[randomPointType],
     cost: generateRandomInteger(500, 7000),
     isFavorite: getBoolean()
   });
 }
 
-export { generateRandomWayPoint, PointTypes };
+export { generateRandomWayPoint, PointTypes, typeOffers, destinations };
