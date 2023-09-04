@@ -227,6 +227,7 @@ export default class PointEditView extends AbstractStatefulView{
   };
 
   #firstDateChangeHandler = (newDate) => {
+    let newEndDate = null;
 
     if(!newDate.length) {
       this.#datepickerStartDate.setDate(dayjs(this._state.dates.start).toISOString());
@@ -235,6 +236,7 @@ export default class PointEditView extends AbstractStatefulView{
 
     if(dayjs(newDate).isAfter(dayjs(this._state.dates.end))) {
       this.#datepickerEndDate.setDate(dayjs(newDate).toISOString());
+      newEndDate = newDate;
     }
 
     this.#datepickerEndDate.set({
@@ -244,7 +246,7 @@ export default class PointEditView extends AbstractStatefulView{
     this._setState({
       dates: {
         start: newDate,
-        end: this._state.dates.end
+        end: newEndDate ?? this._state.dates.end
       }
     });
   };
