@@ -318,6 +318,8 @@ export default class PointEditView extends AbstractStatefulView {
     this.#datepickerStartDate?.destroy();
     this.#datepickerEndDate?.destroy();
   }
+
+  static parsePointToState(point) {
     return { ...point };
   }
 
