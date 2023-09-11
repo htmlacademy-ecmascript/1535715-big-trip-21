@@ -65,11 +65,8 @@ const PointTypes = {
   BUS: 'Bus',
   TRAIN: 'Train',
   SHIP: 'Ship',
-  DRIVE: 'Drive'
-  // FLIGHT: {
-  //   name: 'Flight',
-  //   icon: './img/icons/flight.png'
-  // },
+  DRIVE: 'Drive',
+  FLIGHT: 'Flight'
   // CHECK_IN: {
   //   name: 'Check-in',
   //   icon: './img/icons/check-in.png'
@@ -139,6 +136,14 @@ const typeOffers = {
       checked: getBoolean()
     }
   ],
+
+  [PointTypes.FLIGHT]: [
+    {
+      name: 'Buisness Class',
+      cost: 500,
+      checked: getBoolean()
+    }
+  ]
 };
 
 const destinations = [

@@ -10,12 +10,24 @@ const POINT_EDIT_DATE_FORMAT = 'DD/MM/YY HH:mm';
 
 const POINT_BLANK = {
   id: crypto.randomUUID(),
-  type: PointTypes.TAXI,
-  destination: '',
-  dates: '',
-  offers: '',
+  type: PointTypes.FLIGHT,
+  destination: {
+    name: ''
+  },
+  dates: {
+    start: '2020-10-10',
+    end: '2020-10-11'
+  },
+  offers: typeOffers[PointTypes.FLIGHT],
   cost: 0,
   isFavorite: false
+};
+
+const FLATPICKR_SAME_PROPERTIES = {
+  dateFormat: 'd/m/y H:i',
+  enableTime: true,
+  'time_24hr': true,
+  minuteIncrement: 1,
 };
 
 function createEventTypes(pointTypes) {
@@ -53,12 +65,12 @@ function createDatalistTemplate() {
   return destinations.map((destination) => `<option value="${destination.name}"></option>`).join('');
 }
 
-function createPointEditTemplate(point){
-  const {dates, type, cost, offers, destination} = point;
+function createPointEditTemplate(point, isPointBlank) {
+  const { dates, type, cost, offers, destination } = point;
   const startDate = humanizePointDate(dates.start, POINT_EDIT_DATE_FORMAT);
   const endDate = humanizePointDate(dates.end, POINT_EDIT_DATE_FORMAT);
 
-  return(`<li class="trip-events__item">
+  return (`<li class="trip-events__item">
   <form class="event event--edit" action="#" method="post">
   <header class="event__header">
     <div class="event__type-wrapper">
@@ -102,11 +114,12 @@ function createPointEditTemplate(point){
       <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${cost}">
     </div>
 
-    <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-    <button class="event__reset-btn" type="reset">Delete</button>
-    <button class="event__rollup-btn" type="button">
+    <button class="event__save-btn  btn  btn--blue" type="submit" ${destination.name ? '' : 'disabled'}>Save</button>
+    <button class="event__reset-btn" type="reset">${isPointBlank ? 'Cancel' : 'Delete'}</button>
+    ${isPointBlank ? '' :
+      `<button class="event__rollup-btn" type="button">
       <span class="visually-hidden">Open event</span>
-    </button>
+      </button>`}
   </header>
   <section class="event__details">
 
@@ -130,23 +143,27 @@ function createPointEditTemplate(point){
 </form></li>`);
 }
 
-export default class PointEditView extends AbstractStatefulView{
+export default class PointEditView extends AbstractStatefulView {
   #handleFormSubmit = null;
   #handleCloseButtonClick = null;
   #datepickerStartDate = null;
   #datepickerEndDate = null;
+  #handleDeleteButtonClick = null;
+  #point = null;
 
-  constructor({point = POINT_BLANK, onFormSubmit, onCloseButtonClick}){
+  constructor({ point = POINT_BLANK, onFormSubmit, onCloseButtonClick, onDeleteButtonClick }) {
     super();
+    this.#point = point;
     this._setState(PointEditView.parsePointToState(point));
     this.#handleFormSubmit = onFormSubmit;
     this.#handleCloseButtonClick = onCloseButtonClick;
+    this.#handleDeleteButtonClick = onDeleteButtonClick;
 
     this._restoreHandlers();
   }
 
   get template() {
-    return createPointEditTemplate(this._state);
+    return createPointEditTemplate(this._state, this.#point === POINT_BLANK);
   }
 
   reset(point) {
@@ -157,8 +174,10 @@ export default class PointEditView extends AbstractStatefulView{
     this.element.querySelector('.event--edit')
       .addEventListener('submit', this.#formSubmitHandler);
 
-    this.element.querySelector('.event__rollup-btn')
-      .addEventListener('click', this.#closeButtonClickHandler);
+    if(this.#point !== POINT_BLANK) {
+      this.element.querySelector('.event__rollup-btn')
+        .addEventListener('click', this.#closeButtonClickHandler);
+    }
 
     this.element.querySelector('.event__type-group')
       .addEventListener('change', this.#typeInputChangeHandler);
@@ -169,12 +188,20 @@ export default class PointEditView extends AbstractStatefulView{
     this.element.querySelector('.event__input--price')
       .addEventListener('input', this.#priceInputHandler);
 
+    this.element.querySelector('.event__reset-btn')
+      .addEventListener('click', this.#formDeleteClickHandler);
+
     this.#setDatepicker();
   }
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
     this.#handleFormSubmit(PointEditView.parseStateToPoint(this._state));
+  };
+
+  #formDeleteClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleDeleteButtonClick(PointEditView.parseStateToPoint(this._state));
   };
 
   #closeButtonClickHandler = (evt) => {
@@ -198,7 +225,7 @@ export default class PointEditView extends AbstractStatefulView{
 
     const selectedDestination = destinations.find((destination) => destination.name === evt.target.value);
 
-    if(!selectedDestination) {
+    if (!selectedDestination) {
       evt.target.value = '';
       this.element.querySelector('.event__save-btn').disabled = true;
       return;
@@ -216,7 +243,7 @@ export default class PointEditView extends AbstractStatefulView{
 
     const priceInputValue = Number(evt.target.value);
 
-    if(isNaN(priceInputValue) || priceInputValue < 0) {
+    if (isNaN(priceInputValue) || priceInputValue < 0) {
       evt.target.value = '';
       return;
     }
@@ -228,13 +255,12 @@ export default class PointEditView extends AbstractStatefulView{
 
   #firstDateChangeHandler = (newDate) => {
     let newEndDate = null;
-
-    if(!newDate.length) {
+    if (!newDate.length) {
       this.#datepickerStartDate.setDate(dayjs(this._state.dates.start).toISOString());
       return;
     }
 
-    if(dayjs(newDate).isAfter(dayjs(this._state.dates.end))) {
+    if (dayjs(newDate).isAfter(dayjs(this._state.dates.end))) {
       this.#datepickerEndDate.setDate(dayjs(newDate).toISOString());
       newEndDate = newDate;
     }
@@ -245,14 +271,14 @@ export default class PointEditView extends AbstractStatefulView{
 
     this._setState({
       dates: {
-        start: newDate,
+        start: dayjs(newDate[0]).format('YYYY-MM-DD H:mm'),
         end: newEndDate ?? this._state.dates.end
       }
     });
   };
 
   #secondDateChangeHandler = (newDate) => {
-    if(!newDate.length) {
+    if (!newDate.length) {
       this.#datepickerEndDate.setDate(dayjs(this._state.dates.end).toISOString());
       return;
     }
@@ -272,10 +298,7 @@ export default class PointEditView extends AbstractStatefulView{
     this.#datepickerStartDate = flatpickr(
       this.element.querySelector('#event-start-time-1'),
       {
-        dateFormat: 'd/m/y H:i',
-        enableTime: true,
-        'time_24hr': true,
-        minuteIncrement: 1,
+        ...FLATPICKR_SAME_PROPERTIES,
         onChange: this.#firstDateChangeHandler
       }
     );
@@ -283,21 +306,18 @@ export default class PointEditView extends AbstractStatefulView{
     this.#datepickerEndDate = flatpickr(
       this.element.querySelector('#event-end-time-1'),
       {
-        dateFormat: 'd/m/y H:i',
-        enableTime: true,
-        'time_24hr': true,
+        ...FLATPICKR_SAME_PROPERTIES,
         minDate: new Date(startDateCal).toISOString(),
-        minuteIncrement: 1,
         onChange: this.#secondDateChangeHandler
       }
     );
   }
 
   static parsePointToState(point) {
-    return {...point};
+    return { ...point };
   }
 
   static parseStateToPoint(state) {
-    return {...state};
+    return { ...state };
   }
 }

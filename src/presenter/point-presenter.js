@@ -1,12 +1,12 @@
 import PointEditView from '../view/point-edit-view.js';
 import PointView from '../view/point-view.js';
 import { render, replace, remove } from '../framework/render.js';
+import { UserAction, UpdateType } from '../const.js';
 
 const PointMode = {
   DEFAULT: 'DEFAULT',
   EDITING: 'EDITING'
 };
-
 export default class PointPresenter {
   #pointContainer = null;
   #pointComponent = null;
@@ -38,7 +38,8 @@ export default class PointPresenter {
     this.#pointEditComponent = new PointEditView({
       point: this.#point,
       onFormSubmit: this.#handleFormSubmit,
-      onCloseButtonClick: this.#handleCloseButtonClick});
+      onCloseButtonClick: this.#handleCloseButtonClick,
+      onDeleteButtonClick: this.#handleDeleteButtonClick});
 
     if(previousPointComponent === null || previousPointEditComponent === null) {
       render(this.#pointComponent, this.#pointContainer);
@@ -96,15 +97,19 @@ export default class PointPresenter {
 
   #handleFormSubmit = (point) => {
     this.#replaceEditFormToPoint();
-    this.#handleDataChange(point);
+    this.#handleDataChange(UserAction.UPDATE_POINT, UpdateType.MINOR, point);
   };
 
   #handleCloseButtonClick = () => {
     this.resetPointView();
   };
 
+  #handleDeleteButtonClick = (point) => {
+    this.#handleDataChange(UserAction.REMOVE_POINT, UpdateType.MINOR, point);
+  };
+
   #handleFavoriteClick = () => {
     this.#point.isFavorite = !this.#point.isFavorite;
-    this.#handleDataChange(this.#point);
+    this.#handleDataChange(UserAction.UPDATE_POINT, UpdateType.PATCH, this.#point);
   };
 }

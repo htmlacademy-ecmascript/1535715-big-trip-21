@@ -68,4 +68,4 @@ function generateFilter(points) {
   }));
 }
 
-export {generateRandomInteger, getRandomArrayElement, humanizePointDate, getTimeDifference, updateItem, generateFilter};
+export {generateRandomInteger, getRandomArrayElement, humanizePointDate, getTimeDifference, updateItem, generateFilter, filter};
