@@ -1,13 +1,13 @@
 import SortView from '../view/sort-view.js';
 import EventListView from '../view/events-list-view.js';
 import EmptyListView from '../view/empty-list-view.js';
+import LoadingView from '../view/loading-view.js';
 import PointPresenter from './point-presenter.js';
 import NewPointPresenter from './new-point-presenter.js';
 import dayjs from 'dayjs';
 import { render, remove } from '../framework/render.js';
 import { UserAction, UpdateType, FilterType } from '../const.js';
 import { filter } from '../util.js';
-// import { updateItem } from '../util.js';
 
 const SortType = {
   DAY: 'sort-day',
@@ -19,20 +19,28 @@ export default class BoardPresenter{
   #eventListNoPoints = null;
   #container = null;
   #pointsModel = null;
+  #destinationsModel = null;
+  #offersModel = null;
   #filterModel = null;
   #newPointPresenter = null;
   #eventListContainer = new EventListView();
+  #loadingComponent = new LoadingView();
   #pointPresenters = new Map();
   #currentSortType = SortType.DAY;
   #filterType = FilterType.EVERYTHING;
+  #isLoading = true;
 
-  constructor({container, pointsModel, filterModel, onNewPointDestroy}){
+  constructor({container, pointsModel, destinationsModel, offersModel, filterModel, onNewPointDestroy}){
     this.#container = container;
     this.#pointsModel = pointsModel;
+    this.#destinationsModel = destinationsModel;
+    this.#offersModel = offersModel;
     this.#filterModel = filterModel;
 
     this.#newPointPresenter = new NewPointPresenter({
       pointListContainer: this.#eventListContainer.element,
+      offers: this.#offersModel.offers,
+      destinations: this.#destinationsModel.destinations,
       onDataChange: this.#handleViewAction,
       onDestroy: onNewPointDestroy
     });
@@ -59,7 +67,10 @@ export default class BoardPresenter{
   }
 
   init() {
-    // this.#boardPoints = [...this.#pointsModel.points.sort((a, b) => dayjs(b.dates.start).diff(dayjs(a.start)))];
+    if(this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
 
     if(!this.points.length) {
       remove(this.#sortComponent);
@@ -87,8 +98,6 @@ export default class BoardPresenter{
   };
 
   #handlePointChange = (updatedPoint) => {
-    // this.#boardPoints = updateItem(this.#boardPoints, updatedPoint);
-    // this.#pointPresenters.get(updatedPoint.id).init(updatedPoint);
     this.#pointPresenters.get(updatedPoint.id).init(updatedPoint);
   };
 
@@ -119,6 +128,11 @@ export default class BoardPresenter{
         this.#clearPointsList(true);
         this.init();
         break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
+        this.init();
+        break;
     }
   };
 
@@ -130,19 +144,6 @@ export default class BoardPresenter{
     this.#currentSortType = sortType;
     this.#handleModelEvent(UpdateType.MINOR, this.#pointsModel.points);
   };
-
-  // #sortPoints(sortType) {
-  //   switch(sortType) {
-  //     case SortType.DAY:
-  //       this.#boardPoints.sort((a, b) => dayjs(b.dates.start).diff(dayjs(a.start)));
-  //       break;
-  //     case SortType.TIME:
-  //       this.#boardPoints.sort(((a, b) => dayjs(b.dates.end).diff(dayjs(b.dates.start)) - dayjs(a.dates.end).diff(dayjs(a.dates.start))));
-  //       break;
-  //     case SortType.PRICE:
-  //       this.#boardPoints.sort((a, b) => b.cost - a.cost);
-  //   }
-  // }
 
   #clearPointsList(resetSortType = false) {
     this.#newPointPresenter.destroy();
@@ -166,6 +167,8 @@ export default class BoardPresenter{
   #renderPoint(point) {
     const pointPresenter = new PointPresenter({
       pointContainer: this.#eventListContainer.element,
+      destinationsModel: this.#destinationsModel,
+      offersModel: this.#offersModel,
       onDataChange: this.#handleViewAction,
       onModeChange: this.#handleModeChange});
 
@@ -174,10 +177,11 @@ export default class BoardPresenter{
   }
 
   #renderPoints() {
-    // for(let i = 0; i < this.#boardPoints.length; i++){
-    //   this.#renderPoint(this.#boardPoints[i]);
-    // }
     this.points.forEach((point) => this.#renderPoint(point));
+  }
+
+  #renderLoading() {
+    render(this.#loadingComponent, this.#container);
   }
 
   #renderNoPoints() {
