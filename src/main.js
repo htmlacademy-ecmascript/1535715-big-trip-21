@@ -6,9 +6,7 @@ import DestinationModel from './model/destinations-model.js';
 import OffersModel from './model/offers-model.js';
 import FilterModel from './model/filter-model.js';
 import NewPointButtonView from './view/new-point-button.js';
-import PointApiServie from './point-api-service.js';
-import DestinationApiService from './destination-api-service.js';
-import OffersApiService from './offers-api-service.js';
+import EventsApiService from './events-api-service.js';
 
 import { render } from './framework/render.js';
 
@@ -22,16 +20,18 @@ const filterElement = headerElement.querySelector('.trip-controls__filters');
 const mainElement = bodyElement.querySelector('.page-main');
 const eventListElement = mainElement.querySelector('.trip-events');
 
+const eventsApiService = new EventsApiService(END_POINT, AUTHORIZATION);
+
 const pointsModel = new PointsModel({
-  pointApiService: new PointApiServie(END_POINT, AUTHORIZATION)
+  pointApiService: eventsApiService
 });
 
 const destinationsModel = new DestinationModel({
-  destinationApiService: new DestinationApiService(END_POINT, AUTHORIZATION)
+  destinationApiService: eventsApiService
 });
 
 const offersModel = new OffersModel({
-  offersApiService: new OffersApiService(END_POINT, AUTHORIZATION)
+  offersApiService: eventsApiService
 });
 
 const filterModel = new FilterModel();

@@ -15,7 +15,6 @@ export default class DestinationModel {
     try {
       const destinations = await this.#destinationApiService.destinations;
       this.#destinations = destinations;
-      console.log(this.#destinations)
     } catch(err) {
       this.#destinations = [];
     }

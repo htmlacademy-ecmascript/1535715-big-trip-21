@@ -14,7 +14,6 @@ export default class OffersModel {
     try {
       const offers = await this.#offersApiService.offers;
       this.#offers = offers;
-      console.log(this.#offers);
     } catch(err) {
       this.#offers = [];
     }
@@ -22,16 +21,16 @@ export default class OffersModel {
 
   getOffersByIds(point) {
     if(!point.offers.length) {
-      return ;
+      return [];
     }
 
-    const typeOffers = this.#offers.find((offer) => offer.type === point.type).offers;
-    const sortedTypeOffers = typeOffers.filter((offer) => point.offers.includes(offer.id));
+    const typeOffers = this.getOffersByType(point.type);
+    const filteredTypeOffers = typeOffers.filter((offer) => point.offers.includes(offer.id));
 
-    return sortedTypeOffers;
+    return filteredTypeOffers;
   }
 
   getOffersByType(type) {
-    return this.#offers.find((offer) => offer.type === type).offers;
+    return this.#offers.find((offer) => offer.type === type)?.offers || [];
   }
 }

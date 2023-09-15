@@ -10,10 +10,8 @@ const POINT_EDIT_DATE_FORMAT = 'DD/MM/YY HH:mm';
 
 const POINT_BLANK = {
   id: '',
-  type: PointType.FLIGHT,
-  destination: {
-    name: ''
-  },
+  type: PointType.FLIGHT.toLowerCase(),
+  destination: '',
   dates: {
     start: '',
     end: ''
@@ -30,10 +28,10 @@ const FLATPICKR_SAME_PROPERTIES = {
   minuteIncrement: 1,
 };
 
-function createEventTypes(pointTypes) {
+function createEventTypes(pointTypes, currentType) {
   return Object.values(pointTypes).map((pointTypeName) =>
     `<div class="event__type-item">
-    <input id="event-type-${pointTypeName.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${pointTypeName.toLowerCase()}">
+    <input id="event-type-${pointTypeName.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${pointTypeName.toLowerCase()}" ${pointTypeName.toLowerCase() === currentType ? 'checked' : ''}>
     <label class="event__type-label  event__type-label--${pointTypeName.toLowerCase()}" for="event-type-${pointTypeName.toLowerCase()}-1">${pointTypeName}</label>
     </div>`).join('');
 }
@@ -52,7 +50,7 @@ function createEventOfferSelectorTemplate(allOffers, pointOffers) {
 
   return allOffers.map((offer) =>
     `<div class="event__offer-selector">
-    <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-${++offerNumber}" type="checkbox" name="event-offer-luggage" ${pointOffers.includes(offer.id) ? 'checked' : ''}>
+    <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-${++offerNumber}" type="checkbox" name="event-offer-luggage" ${pointOffers.includes(offer.id) ? 'checked' : ''} value="${offer.id}">
     <label class="event__offer-label" for="event-offer-luggage-${offerNumber}">
       <span class="event__offer-title">${offer.title}</span>
       &plus;&euro;&nbsp;
@@ -65,11 +63,12 @@ function createDatalistTemplate(allDestinations) {
   return allDestinations.map((destination) => `<option value="${destination.name}"></option>`).join('');
 }
 
-function createPointEditTemplate(point, allDestinations, allOffers) {
-  const isPointBlank = point === POINT_BLANK;
+function createPointEditTemplate({point, allDestinations, allOffers, isPointBlank}) {
 
   const { dates, type, cost, offers: pointOffers, destination: destinationId } = point;
-  const pointDestination = isPointBlank ? POINT_BLANK : allDestinations.find((destination) => destination.id === destinationId);
+  const pointDestination = isPointBlank
+    ? null
+    : allDestinations.find((destination) => destination.id === destinationId);
 
   const startDate = humanizePointDate(dates.start, POINT_EDIT_DATE_FORMAT);
   const endDate = humanizePointDate(dates.end, POINT_EDIT_DATE_FORMAT);
@@ -87,7 +86,7 @@ function createPointEditTemplate(point, allDestinations, allOffers) {
       <div class="event__type-list">
         <fieldset class="event__type-group">
           <legend class="visually-hidden">Event type</legend>
-          ${createEventTypes(PointType)}
+          ${createEventTypes(PointType, type)}
         </fieldset>
       </div>
     </div>
@@ -96,7 +95,7 @@ function createPointEditTemplate(point, allDestinations, allOffers) {
       <label class="event__label  event__type-output" for="event-destination-1">
         ${type}
       </label>
-      <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${pointDestination.name}" list="destination-list-1">
+      <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${pointDestination?.name ?? ''}" list="destination-list-1">
       <datalist id="destination-list-1">
         ${createDatalistTemplate(allDestinations)}
       </datalist>
@@ -104,10 +103,10 @@ function createPointEditTemplate(point, allDestinations, allOffers) {
 
     <div class="event__field-group  event__field-group--time">
       <label class="visually-hidden" for="event-start-time-1">From</label>
-      <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${startDate}">
+      <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${startDate ?? ''}">
       &mdash;
       <label class="visually-hidden" for="event-end-time-1">To</label>
-      <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${endDate}">
+      <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${endDate ?? ''}">
     </div>
 
     <div class="event__field-group  event__field-group--price">
@@ -118,7 +117,7 @@ function createPointEditTemplate(point, allDestinations, allOffers) {
       <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${cost}">
     </div>
 
-    <button class="event__save-btn  btn  btn--blue" type="submit" ${pointDestination.name ? '' : 'disabled'}>Save</button>
+    <button class="event__save-btn  btn  btn--blue" type="submit" ${pointDestination?.name ? '' : 'disabled'}>Save</button>
     <button class="event__reset-btn" type="reset">${isPointBlank ? 'Cancel' : 'Delete'}</button>
     ${isPointBlank ? '' :
       `<button class="event__rollup-btn" type="button">
@@ -127,7 +126,7 @@ function createPointEditTemplate(point, allDestinations, allOffers) {
   </header>
   <section class="event__details">
 
-    ${pointOffers.length
+    ${allOffers.length
       ? `<section class="event__section  event__section--offers">
         <h3 class="event__section-title  event__section-title--offers">Offers</h3>
         <div class="event__available-offers">
@@ -136,7 +135,7 @@ function createPointEditTemplate(point, allDestinations, allOffers) {
         </section>`
       : ''}
 
-    ${(pointDestination.description || pointDestination.pictures.length)
+    ${(pointDestination?.description || pointDestination?.pictures.length)
       ? `<section class="event__section  event__section--destination">
         <h3 class="event__section-title  event__section-title--destination">Destination</h3>
         ${pointDestination.description ? `<p class="event__destination-description">${pointDestination.description}</p>` : ''}
@@ -155,13 +154,13 @@ export default class PointEditView extends AbstractStatefulView {
   #handleDeleteButtonClick = null;
   #point = null;
   #destinations = null;
-  #offers = null;
+  #getOffers = null;
 
-  constructor({ point = POINT_BLANK, destinations, offers, onFormSubmit, onCloseButtonClick, onDeleteButtonClick }) {
+  constructor({ point = POINT_BLANK, destinations, getOffers, onFormSubmit, onCloseButtonClick, onDeleteButtonClick }) {
     super();
     this.#point = point;
     this.#destinations = destinations;
-    this.#offers = offers;
+    this.#getOffers = getOffers;
 
     this._setState(PointEditView.parsePointToState(point));
     this.#handleFormSubmit = onFormSubmit;
@@ -172,7 +171,12 @@ export default class PointEditView extends AbstractStatefulView {
   }
 
   get template() {
-    return createPointEditTemplate(this._state, this.#destinations, this.#offers);
+    return createPointEditTemplate({
+      point: this._state,
+      allDestinations: this.#destinations,
+      allOffers: this.#getOffers(this._state.type),
+      isPointBlank: this.#point === POINT_BLANK
+    });
   }
 
   reset(point) {
@@ -186,6 +190,11 @@ export default class PointEditView extends AbstractStatefulView {
     if(this.#point !== POINT_BLANK) {
       this.element.querySelector('.event__rollup-btn')
         .addEventListener('click', this.#closeButtonClickHandler);
+    }
+
+    if(this.#getOffers(this._state.type).length) {
+      this.element.querySelector('.event__available-offers')
+        .addEventListener('change', this.#offersChangeHandler);
     }
 
     this.element.querySelector('.event__type-group')
@@ -218,6 +227,26 @@ export default class PointEditView extends AbstractStatefulView {
     this.#handleCloseButtonClick();
   };
 
+  #offersChangeHandler = (evt) => {
+    if (!evt.target.classList.contains('event__offer-checkbox')) {
+      return;
+    }
+
+    const selectedOffers = this._state.offers;
+    const offerId = evt.target.value;
+    const offerIndex = selectedOffers.indexOf(offerId);
+
+    if(offerIndex !== -1) {
+      selectedOffers.splice(offerIndex, 1);
+    } else {
+      selectedOffers.push(offerId);
+    }
+
+    this._setState({
+      offers: selectedOffers
+    });
+  };
+
   #typeInputChangeHandler = (evt) => {
     evt.preventDefault();
 
@@ -235,6 +264,9 @@ export default class PointEditView extends AbstractStatefulView {
     if (!selectedDestination) {
       evt.target.value = '';
       this.element.querySelector('.event__save-btn').disabled = true;
+      this.updateElement({
+        destination: ''
+      });
       return;
     }
 
@@ -278,7 +310,7 @@ export default class PointEditView extends AbstractStatefulView {
 
     this._setState({
       dates: {
-        start: dayjs(newDate[0]).format('YYYY-MM-DD H:mm'),
+        start: dayjs(newDate[0]).toISOString(),
         end: newEndDate ?? this._state.dates.end
       }
     });
@@ -293,7 +325,7 @@ export default class PointEditView extends AbstractStatefulView {
     this._setState({
       dates: {
         start: this._state.dates.start,
-        end: newDate
+        end: newDate[0].toISOString()
       }
     });
   };
@@ -306,7 +338,7 @@ export default class PointEditView extends AbstractStatefulView {
       this.element.querySelector('#event-start-time-1'),
       {
         ...FLATPICKR_SAME_PROPERTIES,
-        defaultDate: this._state.dates.start,
+        // defaultDate: this._state.dates.start,
         onChange: this.#firstDateChangeHandler
       }
     );
@@ -315,8 +347,8 @@ export default class PointEditView extends AbstractStatefulView {
       this.element.querySelector('#event-end-time-1'),
       {
         ...FLATPICKR_SAME_PROPERTIES,
-        defaultDate: this._state.dates.end,
-        minDate: new Date(startDateCal).toISOString(),
+        // defaultDate: this._state.dates.end,
+        minDate: new Date(startDateCal) ?? '',
         onChange: this.#secondDateChangeHandler
       }
     );
