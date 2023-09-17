@@ -13,8 +13,8 @@ const POINT_BLANK = {
   type: PointType.FLIGHT.toLowerCase(),
   destination: '',
   dates: {
-    start: '',
-    end: ''
+    start: '2020-10-11',
+    end: '2020-10-12'
   },
   offers: [],
   cost: 0,
@@ -66,9 +66,7 @@ function createDatalistTemplate(allDestinations) {
 function createPointEditTemplate({point, allDestinations, allOffers, isPointBlank}) {
 
   const { dates, type, cost, offers: pointOffers, destination: destinationId } = point;
-  const pointDestination = isPointBlank
-    ? null
-    : allDestinations.find((destination) => destination.id === destinationId);
+  const pointDestination = allDestinations.find((destination) => destination.id === destinationId);
 
   const startDate = humanizePointDate(dates.start, POINT_EDIT_DATE_FORMAT);
   const endDate = humanizePointDate(dates.end, POINT_EDIT_DATE_FORMAT);
