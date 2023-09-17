@@ -13,8 +13,8 @@ const POINT_BLANK = {
   type: PointType.FLIGHT.toLowerCase(),
   destination: '',
   dates: {
-    start: '2020-10-11',
-    end: '2020-10-12'
+    start: '',
+    end: ''
   },
   offers: [],
   cost: 0,
@@ -336,7 +336,6 @@ export default class PointEditView extends AbstractStatefulView {
       this.element.querySelector('#event-start-time-1'),
       {
         ...FLATPICKR_SAME_PROPERTIES,
-        // defaultDate: this._state.dates.start,
         onChange: this.#firstDateChangeHandler
       }
     );
@@ -345,11 +344,15 @@ export default class PointEditView extends AbstractStatefulView {
       this.element.querySelector('#event-end-time-1'),
       {
         ...FLATPICKR_SAME_PROPERTIES,
-        // defaultDate: this._state.dates.end,
-        minDate: new Date(startDateCal) ?? '',
         onChange: this.#secondDateChangeHandler
       }
     );
+
+    if(startDateCal) {
+      const endDateCal = new Date(startDateCal);
+      this.#datepickerEndDate.set('minDate', endDateCal);
+    }
+
   }
 
   removeElement() {
