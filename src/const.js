@@ -1,3 +1,15 @@
+const PointType = {
+  TAXI: 'Taxi',
+  BUS: 'Bus',
+  TRAIN: 'Train',
+  SHIP: 'Ship',
+  DRIVE: 'Drive',
+  FLIGHT: 'Flight',
+  CHECK_IN: 'Check-in',
+  SIGHTSEEING: 'Sightseeing',
+  RESTAURANT: 'Restaurant'
+};
+
 const FilterType = {
   EVERYTHING: 'everything',
   FUTURE: 'future',
@@ -22,7 +34,8 @@ const UserAction = {
 const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
-  MAJOR: 'MAJOR'
+  MAJOR: 'MAJOR',
+  INIT: 'INIT'
 };
 
-export {FilterType, SortType, UserAction, UpdateType};
+export {FilterType, SortType, UserAction, UpdateType, PointType};

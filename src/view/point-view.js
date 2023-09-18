@@ -4,20 +4,23 @@ import { humanizePointDate, getTimeDifference} from '../util.js';
 const POINT_DATE_FORMAT = 'MMM D';
 const POINT_TIME_FORMAT = 'HH:mm';
 
-function createPointOffersTemplate(offers) {
-  return offers.map((offer) =>
-    offer.checked ? (
-      `<li class="event__offer">
-          <span class="event__offer-title">${offer.name}</span>
+function createPointOffersTemplate(pointOffers) {
+  if(!pointOffers) {
+    return '';
+  }
+
+  return pointOffers.map((offer) =>
+    (`<li class="event__offer">
+          <span class="event__offer-title">${offer.title}</span>
           &plus;&euro;&nbsp;
-          <span class="event__offer-price">${offer.cost}</span>
-        </li>`) : ''
+          <span class="event__offer-price">${offer.price}</span>
+        </li>`)
   ).join('');
 }
 
 
-function createPointTemplate(point){
-  const {dates, type, cost, offers, destination, isFavorite} = point;
+function createPointTemplate(point, offers, destination){
+  const {dates, type, cost, isFavorite} = point;
 
   const date = humanizePointDate(dates.start, POINT_DATE_FORMAT);
   const dateFirstTime = humanizePointDate(dates.start, POINT_TIME_FORMAT);
@@ -30,7 +33,7 @@ function createPointTemplate(point){
     <div class="event__type">
       <img class="event__type-icon" width="42" height="42" src="./img/icons/${type.toLowerCase()}.png" alt="Event type icon">
     </div>
-    <h3 class="event__title">${type} ${destination.name}</h3>
+    <h3 class="event__title">${type} ${destination}</h3>
     <div class="event__schedule">
       <p class="event__time">
         <time class="event__start-time" datetime="2019-03-18T10:30">${dateFirstTime}</time>
@@ -63,9 +66,14 @@ export default class PointView extends AbstractView{
   #handleEditClick = null;
   #handleFavoriteClick = null;
 
-  constructor({point, onEditClick, onFavoriteClick}){
+  #offers = [];
+  #destination = {};
+
+  constructor({point, destination, offers, onEditClick, onFavoriteClick}){
     super();
     this.#point = point;
+    this.#destination = destination;
+    this.#offers = offers;
     this.#handleEditClick = onEditClick;
     this.#handleFavoriteClick = onFavoriteClick;
 
@@ -77,7 +85,7 @@ export default class PointView extends AbstractView{
   }
 
   get template() {
-    return createPointTemplate(this.#point);
+    return createPointTemplate(this.#point, this.#offers, this.#destination);
   }
 
   #editClickHandler = (evt) => {

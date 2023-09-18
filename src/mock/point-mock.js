@@ -60,29 +60,20 @@ function generateRandomDate() {
   ];
 }
 
-const PointTypes = {
-  TAXI: 'Taxi',
-  BUS: 'Bus',
-  TRAIN: 'Train',
-  SHIP: 'Ship',
-  DRIVE: 'Drive',
-  FLIGHT: 'Flight'
-  // CHECK_IN: {
-  //   name: 'Check-in',
-  //   icon: './img/icons/check-in.png'
-  // },
-  // SIGHTSEEING: {
-  //   name: 'Sightseeing',
-  //   icon: './img/icons/sightseeing.png'
-  // },
-  // RESTARAUNT: {
-  //   name: 'Restaraunt',
-  //   icon: './img/icons/restaraunt.png'
-  // }
+const PointType = {
+  TAXI: 'taxi',
+  BUS: 'bus',
+  TRAIN: 'train',
+  SHIP: 'ship',
+  DRIVE: 'drive',
+  FLIGHT: 'dlight',
+  CHECK_IN: 'check-in',
+  SIGHTSEEING: 'sightseeing',
+  RESTAURANT: 'restaurant'
 };
 
 const typeOffers = {
-  [PointTypes.TAXI]: [
+  [PointType.TAXI]: [
     {
       name: 'Transfer',
       cost: 70,
@@ -95,7 +86,7 @@ const typeOffers = {
     }
   ],
 
-  [PointTypes.BUS]: [
+  [PointType.BUS]: [
     {
       name: 'Switch to comfort',
       cost: 80,
@@ -103,7 +94,7 @@ const typeOffers = {
     }
   ],
 
-  [PointTypes.TRAIN]: [
+  [PointType.TRAIN]: [
     {
       name: 'Switch to coupe',
       cost: 50,
@@ -111,7 +102,7 @@ const typeOffers = {
     }
   ],
 
-  [PointTypes.SHIP]: [
+  [PointType.SHIP]: [
     {
       name: 'Restaurant Entrance',
       cost: 200,
@@ -124,7 +115,7 @@ const typeOffers = {
     }
   ],
 
-  [PointTypes.DRIVE]: [
+  [PointType.DRIVE]: [
     {
       name: 'Extra Luggage',
       cost: 100,
@@ -137,13 +128,13 @@ const typeOffers = {
     }
   ],
 
-  [PointTypes.FLIGHT]: [
+  [PointType.FLIGHT]: [
     {
       name: 'Buisness Class',
       cost: 500,
       checked: getBoolean()
     }
-  ]
+  ],
 };
 
 const destinations = [
@@ -170,7 +161,7 @@ const destinations = [
 ];
 
 function generateRandomWayPoint() {
-  const randomPointType = getRandomArrayElement(Object.values(PointTypes));
+  const randomPointType = getRandomArrayElement(Object.values(PointType));
   const [firstDate, secondDate] = generateRandomDate();
 
   return ({
@@ -187,4 +178,4 @@ function generateRandomWayPoint() {
   });
 }
 
-export { generateRandomWayPoint, PointTypes, typeOffers, destinations };
+export { generateRandomWayPoint, typeOffers, destinations };

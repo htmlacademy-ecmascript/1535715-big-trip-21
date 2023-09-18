@@ -12,14 +12,19 @@ export default class PointPresenter {
   #pointComponent = null;
   #pointEditComponent = null;
 
+  #destinationsModel = null;
+  #offersModel = null;
+
   #handleDataChange = null;
   #handleModeChange = null;
 
   #point = null;
   #mode = PointMode.DEFAULT;
 
-  constructor({pointContainer, onDataChange, onModeChange}) {
+  constructor({pointContainer, destinationsModel, offersModel, onDataChange, onModeChange}) {
     this.#pointContainer = pointContainer;
+    this.#destinationsModel = destinationsModel;
+    this.#offersModel = offersModel;
     this.#handleDataChange = onDataChange;
     this.#handleModeChange = onModeChange;
   }
@@ -32,11 +37,15 @@ export default class PointPresenter {
 
     this.#pointComponent = new PointView({
       point: this.#point,
+      destination: this.#destinationsModel.getDestinationById(this.#point.destination).name,
+      offers: this.#offersModel.getOffersByIds(this.#point),
       onEditClick: this.#handleEditClick,
       onFavoriteClick: this.#handleFavoriteClick});
 
     this.#pointEditComponent = new PointEditView({
       point: this.#point,
+      destinations: this.#destinationsModel.destinations,
+      getOffers: (type) => this.#offersModel.getOffersByType(type),
       onFormSubmit: this.#handleFormSubmit,
       onCloseButtonClick: this.#handleCloseButtonClick,
       onDeleteButtonClick: this.#handleDeleteButtonClick});
@@ -96,8 +105,8 @@ export default class PointPresenter {
   };
 
   #handleFormSubmit = (point) => {
-    this.#replaceEditFormToPoint();
     this.#handleDataChange(UserAction.UPDATE_POINT, UpdateType.MINOR, point);
+    this.#replaceEditFormToPoint();
   };
 
   #handleCloseButtonClick = () => {
