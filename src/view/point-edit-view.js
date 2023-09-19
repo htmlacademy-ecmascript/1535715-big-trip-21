@@ -9,7 +9,6 @@ import 'flatpickr/dist/flatpickr.min.css';
 const POINT_EDIT_DATE_FORMAT = 'DD/MM/YY HH:mm';
 
 const POINT_BLANK = {
-  id: '',
   type: PointType.FLIGHT.toLowerCase(),
   destination: '',
   dates: {

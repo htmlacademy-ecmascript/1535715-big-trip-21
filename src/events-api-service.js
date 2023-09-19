@@ -8,7 +8,9 @@ const RequestUrl = {
 
 const Method = {
   GET: 'GET',
-  PUT: 'PUT'
+  PUT: 'PUT',
+  POST: 'POST',
+  DELETE: 'DELETE'
 };
 
 export default class EventsApiService extends ApiService {
@@ -39,11 +41,11 @@ export default class EventsApiService extends ApiService {
     return parsedResponse;
   }
 
-  async addEvent(event) {
+  async addPoint(point) {
     const response = await this._load({
-      url: RequestUrl.EVENTS,
+      url: RequestUrl.POINTS,
       method: Method.POST,
-      body: JSON.stringify(this.#adaptToServer(event)),
+      body: JSON.stringify(this.#adaptToServer(point)),
       headers: new Headers({
         'Content-type': 'application/json'
       })
@@ -54,9 +56,9 @@ export default class EventsApiService extends ApiService {
     return parsedResponse;
   }
 
-  async deleteEvent(event) {
+  async deletePoint(point) {
     const response = await this._load({
-      url: `${RequestUrl.EVENTS}/${event.id}`,
+      url: `${RequestUrl.POINTS}/${point.id}`,
       method: Method.DELETE
     });
 
