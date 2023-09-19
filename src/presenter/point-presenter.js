@@ -79,6 +79,24 @@ export default class PointPresenter {
     }
   }
 
+  setSaving() {
+    if(this.#mode === PointMode.EDITING) {
+      this.#pointEditComponent.updateElement({
+        isDisabled: true,
+        isSaving: true
+      });
+    }
+  }
+
+  setDeleting() {
+    if(this.#mode === PointMode.EDITING) {
+      this.#pointEditComponent.updateElement({
+        isDisabled: true,
+        isDeleting: true
+      });
+    }
+  }
+
   #replacePointToEditForm() {
     replace(this.#pointEditComponent, this.#pointComponent);
     document.addEventListener('keydown', this.#escKeyDownHandler);
@@ -106,7 +124,7 @@ export default class PointPresenter {
 
   #handleFormSubmit = (point) => {
     this.#handleDataChange(UserAction.UPDATE_POINT, UpdateType.MINOR, point);
-    this.#replaceEditFormToPoint();
+    // this.#replaceEditFormToPoint();
   };
 
   #handleCloseButtonClick = () => {

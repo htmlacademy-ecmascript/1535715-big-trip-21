@@ -64,11 +64,13 @@ function createDatalistTemplate(allDestinations) {
 
 function createPointEditTemplate({point, allDestinations, allOffers, isPointBlank}) {
 
-  const { dates, type, cost, offers: pointOffers, destination: destinationId } = point;
+  const { dates, type, cost, offers: pointOffers, destination: destinationId, isDisabled, isSaving, isDeleting } = point;
   const pointDestination = allDestinations.find((destination) => destination.id === destinationId);
 
   const startDate = humanizePointDate(dates.start, POINT_EDIT_DATE_FORMAT);
   const endDate = humanizePointDate(dates.end, POINT_EDIT_DATE_FORMAT);
+
+  const deletingButtonText = isDeleting ? 'Deleting...' : 'Delete';
 
   return (`<li class="trip-events__item">
   <form class="event event--edit" action="#" method="post">
@@ -114,8 +116,8 @@ function createPointEditTemplate({point, allDestinations, allOffers, isPointBlan
       <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${cost}">
     </div>
 
-    <button class="event__save-btn  btn  btn--blue" type="submit" ${pointDestination?.name ? '' : 'disabled'}>Save</button>
-    <button class="event__reset-btn" type="reset">${isPointBlank ? 'Cancel' : 'Delete'}</button>
+    <button class="event__save-btn  btn  btn--blue" type="submit" ${pointDestination?.name ? '' : 'disabled'} ${isDisabled ? 'disabled' : ''}>${isSaving ? 'Saving...' : 'Save'}</button>
+    <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>${isPointBlank ? 'Cancel' : deletingButtonText}</button>
     ${isPointBlank ? '' :
       `<button class="event__rollup-btn" type="button">
       <span class="visually-hidden">Open event</span>
@@ -361,10 +363,21 @@ export default class PointEditView extends AbstractStatefulView {
   }
 
   static parsePointToState(point) {
-    return { ...point };
+    return {
+      ...point,
+      isDisabled: false,
+      isSaving: false,
+      isDeleting: false
+    };
   }
 
   static parseStateToPoint(state) {
-    return { ...state };
+    const point = {...state};
+
+    delete point.isDisabled;
+    delete point.isSaving;
+    delete point.isDeleting;
+
+    return point;
   }
 }
