@@ -281,7 +281,7 @@ export default class PointEditView extends AbstractStatefulView {
 
     const priceInputValue = Number(evt.target.value);
 
-    if (isNaN(priceInputValue) || priceInputValue < 0) {
+    if (isNaN(priceInputValue) || priceInputValue < 0 || !priceInputValue) {
       evt.target.value = 0;
       return;
     }
