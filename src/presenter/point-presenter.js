@@ -97,6 +97,18 @@ export default class PointPresenter {
     }
   }
 
+  setAborting() {
+    const resetFormState = () => {
+      this.#pointEditComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false
+      });
+    };
+
+    this.#pointEditComponent.shake(resetFormState);
+  }
+
   #replacePointToEditForm() {
     replace(this.#pointEditComponent, this.#pointComponent);
     document.addEventListener('keydown', this.#escKeyDownHandler);
@@ -124,7 +136,6 @@ export default class PointPresenter {
 
   #handleFormSubmit = (point) => {
     this.#handleDataChange(UserAction.UPDATE_POINT, UpdateType.MINOR, point);
-    // this.#replaceEditFormToPoint();
   };
 
   #handleCloseButtonClick = () => {
