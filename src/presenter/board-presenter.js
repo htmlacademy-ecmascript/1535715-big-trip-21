@@ -4,17 +4,11 @@ import EmptyListView from '../view/empty-list-view.js';
 import LoadingView from '../view/loading-view.js';
 import PointPresenter from './point-presenter.js';
 import NewPointPresenter from './new-point-presenter.js';
-import dayjs from 'dayjs';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 import { render, remove } from '../framework/render.js';
-import { UserAction, UpdateType, FilterType } from '../const.js';
-import { filter } from '../util.js';
-
-const SortType = {
-  DAY: 'sort-day',
-  TIME: 'sort-time',
-  PRICE: 'sort-price'
-};
+import { UserAction, UpdateType, FilterType, SortType } from '../const.js';
+import { filter } from '../filter.js';
+import { sort } from '../sort.js';
 
 const TimeLimit = {
   LOWER_LIMIT: 350,
@@ -64,17 +58,9 @@ export default class BoardPresenter{
     this.#filterType = this.#filterModel.filter;
     const points = this.#pointsModel.points;
     const filteredPoints = filter[this.#filterType](points);
+    const sortedPoints = sort[this.#currentSortType](filteredPoints);
 
-    switch(this.#currentSortType) {
-      case SortType.DAY:
-        return filteredPoints.sort((a, b) => dayjs(b.dates.start).diff(dayjs(a.dates.start)));
-      case SortType.TIME:
-        return filteredPoints.sort(((a, b) => dayjs(b.dates.end).diff(dayjs(b.dates.start)) - dayjs(a.dates.end).diff(dayjs(a.dates.start))));
-      case SortType.PRICE:
-        return filteredPoints.sort((a, b) => b.cost - a.cost);
-    }
-
-    return filteredPoints;
+    return sortedPoints;
   }
 
   init() {
