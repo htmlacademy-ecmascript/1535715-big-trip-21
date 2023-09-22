@@ -1,6 +1,6 @@
 import BoardPresenter from './presenter/board-presenter.js';
-import HeaderPresenter from './presenter/header-presenter.js';
 import FilterPresenter from './presenter/filter-presenter.js';
+import TripInfoPresenter from './presenter/trip-info-presenter.js';
 import PointsModel from './model/points-model.js';
 import DestinationModel from './model/destinations-model.js';
 import OffersModel from './model/offers-model.js';
@@ -15,7 +15,8 @@ const END_POINT = 'https://21.objects.pages.academy/big-trip';
 
 const bodyElement = document.querySelector('body');
 const headerElement = bodyElement.querySelector('.page-header');
-const tripInfoElement = headerElement.querySelector('.trip-main');
+const headerMainElement = headerElement.querySelector('.trip-main');
+const tripInfoElement = headerElement.querySelector('.trip-controls');
 const filterElement = headerElement.querySelector('.trip-controls__filters');
 const mainElement = bodyElement.querySelector('.page-main');
 const eventListElement = mainElement.querySelector('.trip-events');
@@ -36,6 +37,13 @@ const offersModel = new OffersModel({
 
 const filterModel = new FilterModel();
 
+const tripInfoPresenter = new TripInfoPresenter({
+  tripInfoContainer: tripInfoElement,
+  pointsModel,
+  offersModel,
+  destinationsModel
+});
+
 const boardPresenter = new BoardPresenter({
   container: eventListElement,
   pointsModel,
@@ -43,10 +51,6 @@ const boardPresenter = new BoardPresenter({
   offersModel,
   filterModel,
   onNewPointDestroy: handleNewPointFormClose
-});
-
-const headerPresenter = new HeaderPresenter({
-  infoContainer: tripInfoElement,
 });
 
 const filterPresenter = new FilterPresenter({
@@ -68,13 +72,13 @@ function handleNewPointButtonClick() {
   newPointButtonComponent.element.disabled = true;
 }
 
-headerPresenter.init();
 boardPresenter.init();
 filterPresenter.init();
 
 offersModel.init()
   .then(() => destinationsModel.init())
   .then(() => pointsModel.init())
+  .then(() => tripInfoPresenter.init())
   .finally(() => {
-    render(newPointButtonComponent, tripInfoElement);
+    render(newPointButtonComponent, headerMainElement);
   });
