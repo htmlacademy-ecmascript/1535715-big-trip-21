@@ -65,6 +65,7 @@ const newPointButtonComponent = new NewPointButtonView({
 
 function handleNewPointFormClose() {
   newPointButtonComponent.element.disabled = false;
+  // boardPresenter.init();
 }
 
 function handleNewPointButtonClick() {

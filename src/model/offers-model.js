@@ -1,6 +1,6 @@
 export default class OffersModel {
-  #offers = [];
   #offersApiService = null;
+  #offers = [];
 
   constructor({offersApiService}) {
     this.#offersApiService = offersApiService;
@@ -16,6 +16,7 @@ export default class OffersModel {
       this.#offers = offers;
     } catch(err) {
       this.#offers = [];
+      this.isLoadingFailed = true;
     }
   }
 

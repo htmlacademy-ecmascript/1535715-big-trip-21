@@ -17,6 +17,7 @@ export default class DestinationModel {
       this.#destinations = destinations;
     } catch(err) {
       this.#destinations = [];
+      this.isLoadingFailed = true;
     }
   }
 

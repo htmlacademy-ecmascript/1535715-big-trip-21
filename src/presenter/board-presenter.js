@@ -10,6 +10,8 @@ import { UserAction, UpdateType, FilterType, SortType } from '../const.js';
 import { filter } from '../filter.js';
 import { sort } from '../sort.js';
 
+const FAILED_TYPE = 'isFailed';
+
 const TimeLimit = {
   LOWER_LIMIT: 350,
   UPPER_LIMIT: 1000
@@ -30,6 +32,7 @@ export default class BoardPresenter{
   #currentSortType = SortType.DAY;
   #filterType = FilterType.EVERYTHING;
   #isLoading = true;
+  #isNewPoint = false;
   #uiBlocker = new UiBlocker({
     lowerLimit: TimeLimit.LOWER_LIMIT,
     upperLimit: TimeLimit.UPPER_LIMIT
@@ -69,13 +72,21 @@ export default class BoardPresenter{
       return;
     }
 
-    if(!this.points.length) {
-      remove(this.#sortComponent);
-      this.#renderNoPoints();
+    if(this.#pointsModel.isLoadingFailed || this.#destinationsModel.isLoadingFailed || this.#offersModel.isLoadingFailed) {
+      this.#renderNoPoints(FAILED_TYPE);
+      this.#pointsModel.isLoadingFailed = false;
+      this.#destinationsModel.isLoadingFailed = false;
+      this.#offersModel.isLoadingFailed = false;
       return;
     }
 
-    if(this.#currentSortType === SortType.DAY && !this.#sortComponent) {
+    if(!this.points.length && !this.#isNewPoint) {
+      remove(this.#sortComponent);
+      this.#renderNoPoints(this.#filterType);
+      return;
+    }
+
+    if(this.#currentSortType === SortType.DAY && !this.#sortComponent && this.points.length) {
       this.#renderSort();
     }
     render(this.#eventListContainer, this.#container);
@@ -84,9 +95,11 @@ export default class BoardPresenter{
   }
 
   createPoint() {
+    this.#isNewPoint = true;
     this.#currentSortType = SortType.DAY;
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
     this.#newPointPresenter.init();
+    this.#isNewPoint = false;
   }
 
   #handleModeChange = () => {
@@ -200,9 +213,9 @@ export default class BoardPresenter{
     render(this.#loadingComponent, this.#container);
   }
 
-  #renderNoPoints() {
+  #renderNoPoints(messageType) {
     this.#eventListNoPoints = new EmptyListView({
-      filterType: this.#filterType
+      messageType
     });
     render(this.#eventListNoPoints, this.#container);
   }
