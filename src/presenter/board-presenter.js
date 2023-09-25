@@ -26,6 +26,7 @@ export default class BoardPresenter{
   #offersModel = null;
   #filterModel = null;
   #newPointPresenter = null;
+  #newPointButtonComponent = null;
   #eventListContainer = new EventListView();
   #loadingComponent = new LoadingView();
   #pointPresenters = new Map();
@@ -38,12 +39,13 @@ export default class BoardPresenter{
     upperLimit: TimeLimit.UPPER_LIMIT
   });
 
-  constructor({container, pointsModel, destinationsModel, offersModel, filterModel, onNewPointDestroy}){
+  constructor({container, pointsModel, destinationsModel, offersModel, filterModel, newPointButtonComponent, onNewPointDestroy}){
     this.#container = container;
     this.#pointsModel = pointsModel;
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
     this.#filterModel = filterModel;
+    this.#newPointButtonComponent = newPointButtonComponent;
 
     this.#newPointPresenter = new NewPointPresenter({
       pointListContainer: this.#eventListContainer.element,
@@ -74,9 +76,7 @@ export default class BoardPresenter{
 
     if(this.#pointsModel.isLoadingFailed || this.#destinationsModel.isLoadingFailed || this.#offersModel.isLoadingFailed) {
       this.#renderNoPoints(FAILED_TYPE);
-      this.#pointsModel.isLoadingFailed = false;
-      this.#destinationsModel.isLoadingFailed = false;
-      this.#offersModel.isLoadingFailed = false;
+      this.#newPointButtonComponent.element.disabled = true;
       return;
     }
 
