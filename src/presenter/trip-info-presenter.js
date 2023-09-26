@@ -5,6 +5,7 @@ import { sort } from '../sort.js';
 import { SortType } from '../const.js';
 
 const DESTINATIONS_LENGTH = 3;
+const DATE_FORMAT = 'DD MMM';
 
 export default class TripInfoPresenter {
   #tripInfoComponent = null;
@@ -63,7 +64,7 @@ export default class TripInfoPresenter {
     const sortedPoints = sort[SortType.DAY](this.#pointsModel.points);
 
     return sortedPoints.length > 0
-      ? `${dayjs(sortedPoints[0].dates.start).format('DD MMM')} — ${dayjs(sortedPoints.at(-1).dates.end).format('DD MMM')}`
+      ? `${dayjs(sortedPoints[0].dates.start).format(DATE_FORMAT)} — ${dayjs(sortedPoints.at(-1).dates.end).format(DATE_FORMAT)}`
       : '';
   }
 

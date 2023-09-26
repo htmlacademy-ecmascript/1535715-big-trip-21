@@ -211,6 +211,77 @@ export default class PointEditView extends AbstractStatefulView {
     this.#setDatepicker();
   }
 
+  removeElement() {
+    super.removeElement();
+    this.#datepickerStartDate?.destroy();
+    this.#datepickerEndDate?.destroy();
+  }
+
+  #firstDateChangeHandler = (newDate) => {
+    let newEndDate = null;
+    if (!newDate.length) {
+      this.#datepickerStartDate.setDate(dayjs(this._state.dates.start).toISOString());
+      return;
+    }
+
+    if (dayjs(newDate).isAfter(dayjs(this._state.dates.end))) {
+      this.#datepickerEndDate.setDate(dayjs(newDate).toISOString());
+      newEndDate = newDate;
+    }
+
+    this.#datepickerEndDate.set({
+      minDate: dayjs(newDate).toISOString()
+    });
+
+    this._setState({
+      dates: {
+        start: dayjs(newDate[0]).toISOString(),
+        end: newEndDate ?? this._state.dates.end
+      }
+    });
+  };
+
+  #secondDateChangeHandler = (newDate) => {
+    if (!newDate.length) {
+      this.#datepickerEndDate.setDate(dayjs(this._state.dates.end).toISOString());
+      return;
+    }
+
+    this._setState({
+      dates: {
+        start: this._state.dates.start,
+        end: newDate[0].toISOString()
+      }
+    });
+  };
+
+  #setDatepicker() {
+
+    const startDateCal = this._state.dates.start;
+
+    this.#datepickerStartDate = flatpickr(
+      this.element.querySelector('#event-start-time-1'),
+      {
+        ...FLATPICKR_SAME_PROPERTIES,
+        onChange: this.#firstDateChangeHandler
+      }
+    );
+
+    this.#datepickerEndDate = flatpickr(
+      this.element.querySelector('#event-end-time-1'),
+      {
+        ...FLATPICKR_SAME_PROPERTIES,
+        onChange: this.#secondDateChangeHandler
+      }
+    );
+
+    if(startDateCal) {
+      const endDateCal = new Date(startDateCal);
+      this.#datepickerEndDate.set('minDate', endDateCal);
+    }
+
+  }
+
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
     this.#handleFormSubmit(PointEditView.parseStateToPoint(this._state));
@@ -294,77 +365,6 @@ export default class PointEditView extends AbstractStatefulView {
       cost: priceInputValue
     });
   };
-
-  #firstDateChangeHandler = (newDate) => {
-    let newEndDate = null;
-    if (!newDate.length) {
-      this.#datepickerStartDate.setDate(dayjs(this._state.dates.start).toISOString());
-      return;
-    }
-
-    if (dayjs(newDate).isAfter(dayjs(this._state.dates.end))) {
-      this.#datepickerEndDate.setDate(dayjs(newDate).toISOString());
-      newEndDate = newDate;
-    }
-
-    this.#datepickerEndDate.set({
-      minDate: dayjs(newDate).toISOString()
-    });
-
-    this._setState({
-      dates: {
-        start: dayjs(newDate[0]).toISOString(),
-        end: newEndDate ?? this._state.dates.end
-      }
-    });
-  };
-
-  #secondDateChangeHandler = (newDate) => {
-    if (!newDate.length) {
-      this.#datepickerEndDate.setDate(dayjs(this._state.dates.end).toISOString());
-      return;
-    }
-
-    this._setState({
-      dates: {
-        start: this._state.dates.start,
-        end: newDate[0].toISOString()
-      }
-    });
-  };
-
-  #setDatepicker() {
-
-    const startDateCal = this._state.dates.start;
-
-    this.#datepickerStartDate = flatpickr(
-      this.element.querySelector('#event-start-time-1'),
-      {
-        ...FLATPICKR_SAME_PROPERTIES,
-        onChange: this.#firstDateChangeHandler
-      }
-    );
-
-    this.#datepickerEndDate = flatpickr(
-      this.element.querySelector('#event-end-time-1'),
-      {
-        ...FLATPICKR_SAME_PROPERTIES,
-        onChange: this.#secondDateChangeHandler
-      }
-    );
-
-    if(startDateCal) {
-      const endDateCal = new Date(startDateCal);
-      this.#datepickerEndDate.set('minDate', endDateCal);
-    }
-
-  }
-
-  removeElement() {
-    super.removeElement();
-    this.#datepickerStartDate?.destroy();
-    this.#datepickerEndDate?.destroy();
-  }
 
   static parsePointToState(point) {
     return {
