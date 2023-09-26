@@ -12,14 +12,12 @@ export default class TripInfoPresenter {
   #pointsModel = null;
   #offersModel = null;
   #destinationsModel = null;
-  #sortedPoints = null;
 
   constructor({tripInfoContainer, pointsModel, offersModel, destinationsModel}) {
     this.#tripInfoContainer = tripInfoContainer;
     this.#pointsModel = pointsModel;
     this.#offersModel = offersModel;
     this.#destinationsModel = destinationsModel;
-    this.#sortedPoints = sort[SortType.DAY](pointsModel.points);
 
     this.#pointsModel.addObserver(this.#handleModelEvent);
   }

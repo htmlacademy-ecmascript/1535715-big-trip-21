@@ -4,14 +4,6 @@ import { FilterType } from './const';
 
 dayjs.extend(duration);
 
-function generateRandomInteger(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function getRandomArrayElement(array) {
-  return array[generateRandomInteger(0, array.length - 1)];
-}
-
 function humanizePointDate(date, format) {
   return date ? dayjs(date).format(format) : '';
 }
@@ -38,10 +30,6 @@ function getTimeDifference(endTime, startTime) {
 
 }
 
-function updateItem(items, update) {
-  return items.map((item) => item.id === update.id ? update : item);
-}
-
 function isPointFuture(point) {
   return dayjs().isBefore(point.dates.start);
 }
@@ -61,11 +49,4 @@ const filter = {
   [FilterType.PAST]: (points) => points.filter((point) => isPointPast(point))
 };
 
-function generateFilter(points) {
-  return Object.entries(filter).map(([filterType, filterPoints]) =>({
-    type: filterType,
-    pointsCount: filterPoints(points).length
-  }));
-}
-
-export {generateRandomInteger, getRandomArrayElement, humanizePointDate, getTimeDifference, updateItem, generateFilter, filter};
+export {humanizePointDate, getTimeDifference, filter};

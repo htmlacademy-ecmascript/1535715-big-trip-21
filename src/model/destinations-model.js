@@ -1,4 +1,3 @@
-
 export default class DestinationModel {
   #destinationApiService = null;
   #destinations = [];
