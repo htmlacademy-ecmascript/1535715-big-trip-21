@@ -3,7 +3,6 @@ import dayjs from 'dayjs';
 import { RenderPosition, remove, render, replace } from '../framework/render.js';
 import { sort } from '../sort.js';
 import { SortType } from '../const.js';
-// import { getMaxDate } from '../utils/dates';
 
 const DESTINATIONS_LENGTH = 3;
 
@@ -13,20 +12,18 @@ export default class TripInfoPresenter {
   #pointsModel = null;
   #offersModel = null;
   #destinationsModel = null;
-  #sortedPoints = null;
 
   constructor({tripInfoContainer, pointsModel, offersModel, destinationsModel}) {
     this.#tripInfoContainer = tripInfoContainer;
     this.#pointsModel = pointsModel;
     this.#offersModel = offersModel;
     this.#destinationsModel = destinationsModel;
-    this.#sortedPoints = sort[SortType.DAY](pointsModel.points);
 
     this.#pointsModel.addObserver(this.#handleModelEvent);
   }
 
   init() {
-    if(!this.#pointsModel.points) {
+    if(this.#pointsModel.isLoadingFailed || !this.#pointsModel.points.length || this.#destinationsModel.isLoadingFailed || this.#offersModel.isLoadingFailed) {
       remove(this.#tripInfoComponent);
       return;
     }
@@ -66,7 +63,7 @@ export default class TripInfoPresenter {
     const sortedPoints = sort[SortType.DAY](this.#pointsModel.points);
 
     return sortedPoints.length > 0
-      ? `${dayjs(sortedPoints[0].dates.start).format('MMM DD')} — ${dayjs(sortedPoints.at(-1).dates.end).format('MMM DD')}`
+      ? `${dayjs(sortedPoints[0].dates.start).format('DD MMM')} — ${dayjs(sortedPoints.at(-1).dates.end).format('DD MMM')}`
       : '';
   }
 

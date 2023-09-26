@@ -44,14 +44,6 @@ const tripInfoPresenter = new TripInfoPresenter({
   destinationsModel
 });
 
-const boardPresenter = new BoardPresenter({
-  container: eventListElement,
-  pointsModel,
-  destinationsModel,
-  offersModel,
-  filterModel,
-  onNewPointDestroy: handleNewPointFormClose
-});
 
 const filterPresenter = new FilterPresenter({
   filterContainer: filterElement,
@@ -63,8 +55,21 @@ const newPointButtonComponent = new NewPointButtonView({
   onClick: handleNewPointButtonClick
 });
 
+const boardPresenter = new BoardPresenter({
+  container: eventListElement,
+  pointsModel,
+  destinationsModel,
+  offersModel,
+  filterModel,
+  newPointButtonComponent,
+  onNewPointDestroy: handleNewPointFormClose
+});
+
 function handleNewPointFormClose() {
   newPointButtonComponent.element.disabled = false;
+  if(!pointsModel.points.length) {
+    boardPresenter.init();
+  }
 }
 
 function handleNewPointButtonClick() {
